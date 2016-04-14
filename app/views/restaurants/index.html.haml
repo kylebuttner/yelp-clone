@@ -19,4 +19,6 @@
 - else
   %h1 No restaurants yet!
 
-%a(href='/restaurants/new') Add a restaurant
+- if user_signed_in? 
+  %a(href='/restaurants/new') Add a restaurant
+
