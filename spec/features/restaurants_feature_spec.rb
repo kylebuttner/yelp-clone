@@ -14,9 +14,16 @@ feature 'restaurants' do
       end
     end
 
-    scenario 'does not let you create restaurant' do
+    scenario 'cannot see Add restaurant link' do
       visit '/restaurants'
       expect(page).not_to have_link 'Add a restaurant'
+    end
+
+    scenario 'cannot access unauthorized views' do
+      visit '/restaurants/new'
+      expect(current_path).to eq '/users/sign_in'
+      visit '/restaurants/1/edit'
+      expect(current_path).to eq '/users/sign_in'
     end
 
     context 'viewing restaurants' do
