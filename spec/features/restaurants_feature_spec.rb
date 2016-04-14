@@ -34,11 +34,7 @@ feature 'restaurants' do
 
   context 'when logged in' do
     before do
-      visit '/users/sign_up'
-      fill_in 'Email', with: 'test@test.com'
-      fill_in 'Password', with: '12345678'
-      fill_in 'Password confirmation', with: '12345678'
-      click_button 'Sign up'
+      sign_up
     end
 
     context 'no restaraunts have been added' do
@@ -52,20 +48,19 @@ feature 'restaurants' do
 
     context 'creating restaurants' do
       scenario 'prompts user to fill out a form, then displays the new restaurant' do
-        visit '/restaurants'
-        click_link 'Add a restaurant'
-        fill_in 'Name', with: 'KFC'
-        click_button 'Create Restaurant'
+        create_restaurant
         expect(page).to have_content 'KFC'
         expect(current_path).to eq '/restaurants'
       end
     end
 
 
-    context 'editing restaurants' do
-      before { Restaurant.create name: 'KFC' }
+    context 'ammending restaurants' do
+      before do
+        create_restaurant
+      end 
 
-      scenario 'let a user edit a restaurant' do
+      scenario 'let a user edit their restaurant' do
         visit '/restaurants'
         click_link 'Edit KFC'
         fill_in 'Name', with: 'Kentucky Fried Chicken'
@@ -73,28 +68,36 @@ feature 'restaurants' do
         expect(page).to have_content 'Kentucky Fried Chicken'
         expect(current_path).to eq '/restaurants'
       end
-    end
 
-    context 'deleting restuarants' do
-      before {Restaurant.create name: 'KFC'}
-
-      scenario 'User can delete restaurant' do
+      scenario 'does not let a user edit a restaurant they did not create' do
+        click_link 'Sign out'
+        visit '/users/sign_up'
+        fill_in 'Email', with: 'test2@test.com'
+        fill_in 'Password', with: '12345678'
+        fill_in 'Password confirmation', with: '12345678'
+        click_button 'Sign up'
         visit '/restaurants'
-        click_link 'Delete KFC'
-        expect(page).not_to have_content 'KFC'
-        expect(page).to have_content 'Restaurant deleted sucessfully'
+        expect(page).not_to have_link 'Edit KFC' 
+      end
+
+      context 'deleting restuarants' do
+        scenario 'User can delete restaurant' do
+          visit '/restaurants'
+          click_link 'Delete KFC'
+          expect(page).not_to have_content 'KFC'
+          expect(page).to have_content 'Restaurant deleted sucessfully'
+        end
       end
     end
-
-    context 'an invalid restaurant' do
-      it 'does not let you submit a name that is too short' do
-        visit '/restaurants'
-        click_link 'Add a restaurant'
-        fill_in 'Name', with: 'kf'
-        click_button 'Create Restaurant'
-        expect(page).not_to have_css 'h2', text: 'kf'
-        expect(page).to have_content 'error'
+      context 'an invalid restaurant' do
+        it 'does not let you submit a name that is too short' do
+          visit '/restaurants'
+          click_link 'Add a restaurant'
+          fill_in 'Name', with: 'kf'
+          click_button 'Create Restaurant'
+          expect(page).not_to have_css 'h2', text: 'kf'
+          expect(page).to have_content 'error'
+        end
       end
     end
   end
-end
