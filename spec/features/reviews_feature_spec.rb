@@ -4,7 +4,7 @@ feature 'reviewing' do
   before do
     sign_up
     create_restaurant
-  end 
+  end
 
   context 'review has been left' do
     before do
@@ -26,8 +26,15 @@ feature 'reviewing' do
       expect(Review.count).to be 0
     end
 
-    scenario 'user can only leave one review per restaurant' do
-      expect(page).not_to have_link 'Review KFC'
+    context 'user can only leave one review per restaurant' do
+      scenario 'link is hidden to leave review' do
+        expect(page).not_to have_link 'Review KFC'
+      end
+
+      xscenario 'should not be able to access new review page' do
+        visit "restaurants/#{Restaurant.first.id}/reviews/new"
+        expect(current_path).to eq '/'
+      end
     end
 
     scenario 'user can delete their own reviews' do

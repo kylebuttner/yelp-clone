@@ -1,7 +1,7 @@
 - if @restaurants.any?
   - @restaurants.each do |restaurant|
     = link_to restaurant.name, restaurant_path(restaurant)
-    - if user_signed_in? && restaurant.reviews.none? {|review| review.user_id == current_user.id}
+    - if user_signed_in? && !current_user.has_reviewed?(restaurant)
       = link_to "Review #{restaurant.name}", new_restaurant_review_path(restaurant)
     - if user_signed_in? && restaurant.user_id == current_user.id
       = link_to "Edit #{restaurant.name}", edit_restaurant_path(restaurant)
@@ -15,9 +15,10 @@
           %li
             =review.thoughts
             %strong= review.rating
+            %p= pluralize review.endorsements.count, 'endorsement'
             \/5
             - if user_signed_in? && review.user_id == current_user.id
-              = link_to 'Delete review', restaurant_review_path(restaurant, review), method: :delete
+              = link_to 'Delete review', review_path(review), method: :delete
     - else
       %p No reviews
 - else
