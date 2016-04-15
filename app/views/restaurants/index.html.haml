@@ -15,7 +15,9 @@
           %li
             =review.thoughts
             %strong= review.rating
-            %p= pluralize review.endorsements.count, 'endorsement'
+            = link_to "Endorse", review_endorsements_path(review), class: 'endorsements-link'
+            %span.endorsements_count= review.endorsements.count
+            = 'endorsement'.pluralize review.endorsements.count
             \/5
             - if user_signed_in? && review.user_id == current_user.id
               = link_to 'Delete review', review_path(review), method: :delete
